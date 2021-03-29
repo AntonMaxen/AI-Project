@@ -1,6 +1,6 @@
 # Ljud/Music
- -Avgöra låt beroende på en annan låt.
- -Ge låtar som liknar din favoritlåt.
+ - Avgöra låt beroende på en annan låt.
+ - Ge låtar som liknar din favoritlåt.
 # Computer Vision
 - Avgöra pingvinras
 - Avgöra vänner och fiender baserat på bilder.
