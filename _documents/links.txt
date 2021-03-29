@@ -5,3 +5,7 @@ https://www.metmuseum.org/about-the-met/policies-and-documents/open-access
 https://digitaltmuseum.se/
 https://docs.google.com/document/d/14UpPu3pnkwgmPIzkhkD6y-DUrQrBAzCsODdz8VtIOkg/edit?usp=sharing
 https://www.wikiart.org/
+https://github.com/cs-chan/ArtGAN/blob/master/WikiArt%20Dataset/README.md
+https://dudeperf3ct.github.io/style/transfer/2018/12/23/Magic-of-Style-Transfer/
+https://www.bogotobogo.com/python/python_image_processing_with_Pillow_library.php
+https://brachiograph.readthedocs.io/en/latest/how-to/use-linedraw.html
