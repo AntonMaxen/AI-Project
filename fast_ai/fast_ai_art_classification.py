@@ -29,7 +29,7 @@ def main():
     learner.fit_one_cycle(7, max_lr=slice(1e-6, 3e-4))
 
     img = open_image('data/test_1.jpg')
-    pred = learner.predict(img);
+    pred = learner.predict(img)
     pred
     print()
 
