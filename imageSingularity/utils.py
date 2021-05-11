@@ -67,7 +67,7 @@ def test_create_db_and_load_images():
 
     create_image_db(100, dataset_path, categories, (100, 100), db_path)
     images = load_images(db_path, categories)
-    print(images['Realism']['images'][0])
+    print(images['Realism']['images'])
 
 
 def main():
