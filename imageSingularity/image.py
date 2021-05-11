@@ -33,7 +33,7 @@ class DenseNet(Model):
 
 def main():
     my_image = Image([1, 2, 3, 4])
-    my_image.elements = my_image.elements.reshape((2,2))
+    my_image.elements = my_image.elements.reshape((2, 2))
     print(my_image.elements)
 
 
