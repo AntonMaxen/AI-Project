@@ -16,21 +16,8 @@ class Images:
         self.images = load_images(db_path, ["Realism", "Cubism"])
 
 
-class Model:
-    def __init__(self, images):
-        self.images = images
-        pass
-
-    def train(self):
-        pass
-
-    def predict(self):
-        pass
 
 
-class DenseNet(Model):
-    def __init__(self):
-        super(DenseNet).__init__()
 
 
 def main():
