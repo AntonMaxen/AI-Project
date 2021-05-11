@@ -1,4 +1,6 @@
 import numpy as np
+import os
+from utils import load_images, get_project_root
 
 
 class Image:
@@ -8,10 +10,10 @@ class Image:
 
 class Images:
     def __init__(self):
-        pass
+        self.images = None
 
-    def load(self):
-        pass
+    def load(self, db_path):
+        self.images = load_images(db_path, ["Realism", "Cubism"])
 
 
 class Model:
@@ -32,9 +34,13 @@ class DenseNet(Model):
 
 
 def main():
-    my_image = Image([1, 2, 3, 4])
-    my_image.elements = my_image.elements.reshape((2,2))
-    print(my_image.elements)
+    #my_image = Image([1, 2, 3, 4])
+    #my_image.elements = my_image.elements.reshape((2, 2))
+    images = Images()
+    db_path = os.path.join(get_project_root(), 'hej.hdf5')
+    images.load(db_path)
+
+    print(images.images)
 
 
     #images = Images()
