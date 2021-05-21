@@ -1,5 +1,5 @@
 import h5py
-from PIL import Image
+from PIL import Image, ImageFile
 import os
 import numpy as np
 from pathlib import Path
@@ -16,9 +16,11 @@ def create_image_db(amount, dataset_folder, categories, size, db_path):
         path = os.path.join(dataset_folder, category)
         for i, filename in enumerate(os.listdir(path)):
             if i <= amount:
+                print(f'{i}-({category}): {filename}')
                 fullpath = os.path.join(path, filename)
-                img_data = Image.open(fullpath)
-                img_data = img_data.resize(size)
+                ImageFile.LOAD_TRUNCATED_IMAGES = True
+                with Image.open(fullpath) as im:
+                    img_data = im.resize(size)
                 img_data = np.asarray(img_data)
                 file_names.append(filename)
                 image_list.append(img_data)
@@ -62,10 +64,10 @@ def get_project_root():
 def test_create_db_and_load_images():
     base = get_project_root()
     db_path = os.path.join(base, "hej.hdf5")
-    dataset_path = os.path.join(base, "wikiart")
+    dataset_path = os.path.join(base, "wikiarta")
     categories = os.listdir(dataset_path)
 
-    create_image_db(100, dataset_path, categories, (100, 100), db_path)
+    create_image_db(100, dataset_path, categories, (224, 224), db_path)
     images = load_images(db_path, categories)
     print(images['Realism']['images'])
 
