@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from utils import load_images, get_project_root
+from imageSingularity.utils import load_images, get_project_root
 
 
 class Image:
@@ -12,25 +12,8 @@ class Images:
     def __init__(self):
         self.images = None
 
-    def load(self, db_path):
-        self.images = load_images(db_path, ["Realism", "Cubism"])
-
-
-class Model:
-    def __init__(self, images):
-        self.images = images
-        pass
-
-    def train(self):
-        pass
-
-    def predict(self):
-        pass
-
-
-class DenseNet(Model):
-    def __init__(self):
-        super(DenseNet).__init__()
+    def load(self, db_path, categories):
+        self.images = load_images(db_path, categories)
 
 
 def main():
