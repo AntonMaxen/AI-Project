@@ -1,4 +1,8 @@
 import os
+
+import tensorflow.python.framework.ops
+import tensorflow as tf
+
 from imageSingularity.image import Images
 from imageSingularity.utils import create_image_db, get_project_root
 from sklearn.model_selection import train_test_split
@@ -7,7 +11,10 @@ import numpy as np
 
 from tensorflow import keras
 from imageSingularity.Models import IsModel
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import (
+    Dense, GlobalAveragePooling2D,
+    BatchNormalization, Dropout
+)
 
 from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from tensorflow.keras.applications import DenseNet121
@@ -44,7 +51,8 @@ class DenseNet(IsModel):
         self.amount_categories = 0
         self.base_model = DenseNet121(
             weights='imagenet',
-            include_top=True
+            include_top=False,
+            input_shape=(224, 224, 3)
         )
         self.model = None
         self.x_train = None
@@ -60,27 +68,55 @@ class DenseNet(IsModel):
         self.amount_categories = len(self.categories)
         # Some stuff
         all_images, all_labels = reformat_images(self.images)
+        all_images = np.array(all_images, dtype="float32") / 255.0
+        print(all_images[0])
         mlb = LabelBinarizer()
         all_labels = mlb.fit_transform(all_labels)
+
+        if self.amount_categories < 3:
+            all_labels = tensorflow.keras.utils.to_categorical(all_labels)
+
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
             all_images,
             all_labels,
-            test_size=0.4,
+            test_size=0.2,
+            random_state=42
+        )
+
+        self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(
+            self.x_train,
+            self.y_train,
+            test_size=0.2,
             random_state=42
         )
 
     def setup(self):
         x = self.base_model.output
-        x = Dense(self.amount_categories, activation='softmax')(x)
+        x = GlobalAveragePooling2D()(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.5)(x)
+        x = Dense(1024, activation='relu')(x)
+        x = Dense(512, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(0.5)(x)
+        x = Dense(self.amount_categories, activation='softmax')(x) #Fully Connected Layers
         self.model = Model(inputs=self.base_model.input, outputs=x)
 
+        """
+        Leave the base model alone and just train last layers and your fully connected classification layer.
+        """
         for layer in self.model.layers[:-8]:
             layer.trainable = False
+            print(layer.name)
+
+        print('=' * 20)
 
         for layer in self.model.layers[-8:]:
             layer.trainable = True
+            print(layer.name)
 
         self.model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        # print(self.model.summary())
 
     def train(self, checkpoint_list, epochs=5):
         self.model.fit(
@@ -89,7 +125,7 @@ class DenseNet(IsModel):
             epochs=epochs,
             verbose=2,
             callbacks=checkpoint_list,
-            validation_data=(self.x_train, self.y_train)
+            validation_data=(self.x_val, self.y_val)
         )
 
     def evalute(self):
@@ -127,7 +163,20 @@ def test_model_load():
 def dense_net_test():
     db_path = os.path.join(get_project_root(), 'images.hdf5')
     images = Images()
-    categories = ['Rococo', 'Color_Field_Painting', 'Art_Nouveau_Modern']
+    categories = ['Abstract_Expressionism', 'Art_Nouveau_Modern',
+                  'Baroque', 'Color_Field_Painting',
+                  'Cubism', 'Early_Renaissance',
+                  'Expressionism', 'Rococo',
+                  'Color_Field_Painting', 'Art_Nouveau_Modern']
+
+    categories = ['Abstract_Expressionism', 'Art_Nouveau_Modern',
+                  'Baroque', 'Color_Field_Painting',
+                  'Cubism']
+
+    categories = ['Abstract_Expressionism', 'Art_Nouveau_Modern',
+                  'Baroque', 'Color_Field_Painting']
+    # categories = ['Color_Field_Painting', 'Rococo']
+
     images.load(db_path, categories)
 
     dn = DenseNet()
@@ -139,5 +188,35 @@ def dense_net_test():
     checkpoint = ModelCheckpoint('model.h5', verbose=1, save_best_only=True)
     checkpoint_list = [anne, checkpoint]
     # train class
-    dn.train(checkpoint_list, epochs=2)
+    dn.train(checkpoint_list, epochs=10)
     print(dn.evalute())
+
+
+def evaluate_test():
+    db_path = os.path.join(get_project_root(), 'images.hdf5')
+    images = Images()
+    categories = ['Abstract_Expressionism', 'Art_Nouveau_Modern',
+                  'Baroque', 'Color_Field_Painting',
+                  'Cubism', 'Early_Renaissance',
+                  'Expressionism', 'Rococo',
+                  'Color_Field_Painting', 'Art_Nouveau_Modern']
+
+    categories = ['Abstract_Expressionism', 'Art_Nouveau_Modern',
+                  'Baroque', 'Color_Field_Painting',
+                  'Cubism']
+
+    categories = ['Color_Field_Painting', 'Rococo']
+
+    categories = ['Abstract_Expressionism', 'Art_Nouveau_Modern',
+                  'Baroque']
+
+    images.load(db_path, categories)
+    dn = DenseNet()
+    dn.load_data(images.images)
+    dn.load('model.h5')
+    dn.evalute()
+
+
+if __name__ == '__main__':
+    # dense_net_test()
+    evaluate_test()
