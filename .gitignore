@@ -2,7 +2,6 @@
 venv/
 *__pycache__
 *.hdf5
-*.h5
 *.pyc
 wikiart
 *.pickle
