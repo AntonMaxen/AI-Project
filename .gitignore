@@ -4,3 +4,5 @@ venv/
 *.hdf5
 *.h5
 *.pyc
+wikiart
+*.pickle

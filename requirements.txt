@@ -3,4 +3,5 @@ sklearn
 pandas
 Pillow
 numpy
+matplotlib
 
